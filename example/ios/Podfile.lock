@@ -1,0 +1,22 @@
+PODS:
+  - baidu_speech_recognition (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+
+DEPENDENCIES:
+  - baidu_speech_recognition (from `.symlinks/plugins/baidu_speech_recognition/ios`)
+  - Flutter (from `.symlinks/flutter/ios-release`)
+
+EXTERNAL SOURCES:
+  baidu_speech_recognition:
+    :path: ".symlinks/plugins/baidu_speech_recognition/ios"
+  Flutter:
+    :path: ".symlinks/flutter/ios-release"
+
+SPEC CHECKSUMS:
+  baidu_speech_recognition: 2eda903e9727e7b99ef81a605ae013e77e3a0bfa
+  Flutter: 9d0fac939486c9aba2809b7982dfdbb47a7b0296
+
+PODFILE CHECKSUM: 1e5af4103afd21ca5ead147d7b81d06f494f51a2
+
+COCOAPODS: 1.5.3
