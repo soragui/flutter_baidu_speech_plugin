@@ -1,6 +1,9 @@
 # Flutter Baidu Speech Recognition Plugin 
 
+[![pub](https://img.shields.io/pub/v/baidu_speech_recognition.svg?style=flat-square)](https://pub.dartlang.org/packages/baidu_speech_recognition)
+
 A speech recognition plugin for flutter using BaiduSDK.See the changelog for more information about the function.
+
 
 ## TODO
 
