@@ -1,3 +1,5 @@
 ## 0.0.1
-
-* TODO: Describe initial release.
+    
+- 60s 短语音 识别
+- 长语音识别
+- iOS 支持

@@ -1,8 +1,8 @@
 name: baidu_speech_recognition
 description: Baidu Speech Recognition Flutter plugin.
 version: 0.0.1
-author:
-homepage:
+author: soragui <ziwo520@msn.cn>
+homepage: https://github.com/soragui/flutter_baidu_speech_plugin
 
 environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"

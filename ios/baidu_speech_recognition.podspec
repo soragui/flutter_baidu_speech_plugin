@@ -8,9 +8,9 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
 Baidu Speech Recognition Flutter plugin.
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://github.com/soragui/flutter_baidu_speech_plugin'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'soragui' => 'ziwo520@msn.cn' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
