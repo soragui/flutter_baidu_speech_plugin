@@ -23,27 +23,11 @@ dependencies:
 ```dart
 import 'package:baidu_speech_recognition_example/speech_app.dart';
 
-
-String _recResult;
-StreamSubscription<String> _recCallback;
 BaiduSpeechRecognition _speechRecognition = BaiduSpeechRecognition();
 
 // initialize 
 _speechRecognition.init().then((value) => print(value));
-
-// For speech recognition result callback 
-_recCallback = _speechRecognition.onVoiceRecognition()
-      .listen((String result) {
-
-        setState(() {
-          if (result != null) {
-            _recResult = result;
-            print(_recResult);
-          }
-        });
-
-});
-
+ 
 // start long speech recognition 
  _speechRecognition.startLongSpeech().then((value) => print(value)); 
 
@@ -52,8 +36,36 @@ _recCallback = _speechRecognition.onVoiceRecognition()
 
 // cancel recognition 
  _speechRecognition.cancel().then((value) => print(value));
-
+  
 ```
+
+### The Callback Listener
+You can add a listener :
+```dart
+_speechRecognitoin.speechRecognitionEvents
+      .listen((String value) {
+        // TODO do somethig with the value
+      }
+```
+
+The return value is a JSON String :
+```json
+{
+  "type": "The recognition result type",
+  "value": "The result"
+}
+```
+the `type` have the following value:
+
+| type | desc |
+|---|---|
+|start|start speaking...|
+|stop|stop speaking. and return the last result|
+|cancel|cancel the last recognition|
+|finish|return the last recognition|
+|lfinish|long speech return|
+|end|end speaking...|
+|meter|return volume meter level|
 
 ### For iOS developer
 Go to [百度ASR](http://ai.baidu.com/sdk#asr) download SDK for iOS,then copy BDSClientLib and BDSClientResource to the same directory of you flutter project,the file structure like this:

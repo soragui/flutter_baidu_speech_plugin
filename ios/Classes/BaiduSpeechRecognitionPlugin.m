@@ -56,6 +56,11 @@ const NSString* APP_ID = @"11719380";
         [self start];
         result(@"speech.start call");
 
+    } else if ([@"speechStop" isEqualToString:call.method]) {
+        
+        [self stop];
+        result(@"speech.stop call");
+        
     } else if ([@"speechCancel" isEqualToString:call.method]) {
 
         [self cancel];
@@ -129,6 +134,7 @@ const NSString* APP_ID = @"11719380";
 // 开启 语音 识别
 - (void)start
 {
+    self.longSpeechFlag = NO;
     [self configFileHandler];
     [self.asrEventManager setDelegate:self];
     [self.asrEventManager setParameter:nil forKey:BDS_ASR_AUDIO_FILE_PATH];
@@ -231,9 +237,10 @@ const NSString* APP_ID = @"11719380";
 - (void)VoiceRecognitionClientWorkStatus:(int)workStatus obj:(id)aObj {
     
     //NSLog(@"client delegate func");
+    NSMutableDictionary *returnDic = [[NSMutableDictionary alloc] initWithCapacity:2];
     
     switch (workStatus) {
-            
+        
         case EVoiceRecognitionClientWorkStatusNewRecordData: {
             [self.fileHandler writeData:(NSData *)aObj];
             break;
@@ -248,6 +255,11 @@ const NSString* APP_ID = @"11719380";
         case EVoiceRecognitionClientWorkStatusMeterLevel: {
             
             //[self printLogTextView:[NSString stringWithFormat:@"CALLBACK: meter level %@", aObj]];
+            //NSMutableDictionary *meterDic = [[NSMutableDictionary alloc] initWithCapacity:2];
+            [returnDic setObject:@"meter" forKey:@"type"];
+            [returnDic setObject:aObj forKey:@"value"];
+            
+            self.flutterEventSink([self getDescriptionForDic:returnDic]);
             break;
             
         }
@@ -255,31 +267,58 @@ const NSString* APP_ID = @"11719380";
             
         case EVoiceRecognitionClientWorkStatusStart: {
             [self printLogTextView:@"CALLBACK: detect voice start point.\n"];
+            [returnDic setObject:@"start" forKey:@"type"];
+            
+            self.flutterEventSink([self getDescriptionForDic:returnDic]);
             break;
         }
             
         case EVoiceRecognitionClientWorkStatusEnd: {
             [self printLogTextView:@"CALLBACK: detect voice end point.\n"];
+            [returnDic setObject:@"end" forKey:@"type"];
+            
+            self.flutterEventSink([self getDescriptionForDic:returnDic]);
             break;
         }
             
         case EVoiceRecognitionClientWorkStatusCancel: {
             [self printLogTextView:@"CALLBACK: user press cancel.\n"];
+            [returnDic setObject:@"cancel" forKey:@"type"];
+            
+            self.flutterEventSink([self getDescriptionForDic:returnDic]);
+            break;
+        }
+            
+        case EVoiceRecognitionClientWorkStatusLongSpeechEnd: {
+            [returnDic setObject:@"longSpeechEnd" forKey:@"type"];
+            
+            if (aObj != nil) {
+                [returnDic setObject:aObj forKey:@"value"];
+            }
+            
+            self.flutterEventSink([self getDescriptionForDic:returnDic]);
             break;
         }
             
         case EVoiceRecognitionClientWorkStatusFinish: {
             //[self printLogTextView:[NSString stringWithFormat:@"CALLBACK: final result - %@.\n\n", [self getDescriptionForDic:aObj]]];
-            self.flutterEventSink([self getDescriptionForDic:aObj]);
+            
+            //[returnDic setObject:@"finish" forKey:@"type"];
+            
             if (!self.longSpeechFlag) {
-                //[self onEnd];
+                [returnDic setObject:@"finish" forKey:@"type"];
+            } else {
+                [returnDic setObject:@"lfinish" forKey:@"type"];
             }
+            
+            [returnDic setObject:aObj forKey:@"value"];
+            
+            self.flutterEventSink([self getDescriptionForDic:returnDic]);
             
             break;
         }
             
         case EVoiceRecognitionClientWorkStatusError: {
-            NSLog([NSString stringWithFormat:@"CALLBACK: encount error - %@.\n", (NSError *)aObj]);
             break;
         }
     }

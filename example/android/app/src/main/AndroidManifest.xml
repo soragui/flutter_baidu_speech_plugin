@@ -35,5 +35,19 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="com.baidu.speech.APP_ID"
+            android:value="11719380"/>
+        <meta-data
+            android:name="com.baidu.speech.API_KEY"
+            android:value="Ge2kYvna0IymBqcupFwq5fAV"/>
+        <meta-data
+            android:name="com.baidu.speech.SECRET_KEY"
+            android:value="skMQOIKKmqLI2brAceEkadz9VgjO3KfR"/>
+
+        <service
+            android:name="com.baidu.speech.VoiceRecognitionService"
+            android:exported="false" />
     </application>
 </manifest>

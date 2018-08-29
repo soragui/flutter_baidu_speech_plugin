@@ -1,8 +1,8 @@
 
 import 'package:flutter/material.dart';
 
-
-import 'package:baidu_speech_recognition/baidu_speech_recognition.dart'; 
+import 'package:baidu_speech_recognition/baidu_speech_recognition.dart';
+import 'dart:convert';
 import 'dart:async';
 
 void main() => runApp(new MyApp());
@@ -20,14 +20,31 @@ enum MenuItem { longSpeech }
 class _MyAppState extends State<MyApp> {
 
 
-  String _recResult;
-
-  StreamSubscription<String> _recCallback;
+  Map<String, dynamic> _recResult;
 
   BaiduSpeechRecognition _speechRecognition = BaiduSpeechRecognition();
 
   bool isStart = false;
   bool isLongSpeech = false;
+  
+  List<String> results = List();
+
+  int meterLevel = 0;
+
+  StreamSubscription<dynamic> _speechEvents;
+
+  final List<String> icons = <String>[
+
+    'assets/images/meter_level_0.png',
+    'assets/images/meter_level_1.png',
+    'assets/images/meter_level_2.png',
+    'assets/images/meter_level_3.png',
+    'assets/images/meter_level_4.png',
+    'assets/images/meter_level_5.png',
+    'assets/images/meter_level_6.png',
+
+  ];
+
 
   Widget _buildPopupMenu() {
     return new PopupMenuButton<MenuItem>(
@@ -55,6 +72,37 @@ class _MyAppState extends State<MyApp> {
       ],
     );
   }
+  
+  Widget _buildRecognitionResultItem(BuildContext context, int index) {
+    
+    return Column(
+
+        crossAxisAlignment: CrossAxisAlignment.end,
+
+        children: <Widget>[
+
+          Container(
+
+            margin: EdgeInsets.all(5.0),
+            padding: EdgeInsets.all(5.0),
+
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(4.0)),
+              color: Colors.blue
+            ),
+
+            child: Text(
+                results[index]
+            ),
+
+          )
+
+
+        ],
+
+    );
+    
+  }
 
   _startSpeechRecognition() {
 
@@ -69,7 +117,7 @@ class _MyAppState extends State<MyApp> {
 
     } else {
 
-      _speechRecognition.cancel().then((value) => print(value));
+      _speechRecognition.stop().then((value) => print(value));
       isStart = false;
 
     }
@@ -95,21 +143,68 @@ class _MyAppState extends State<MyApp> {
     // 初始化
     _speechRecognition.init().then((value) => print(value));
 
-    _recCallback = _speechRecognition.onVoiceRecognition()
-        .listen((String result) {
+    _speechEvents = _speechRecognition.speechRecognitionEvents
+      .listen((String value) {
 
-      setState(() {
-        if (result != null) {
-          _recResult = result;
-          print(_recResult);
+        if (value != null) {
+
+        _recResult = jsonDecode(value);
+        print(_recResult);
+
+          setState(() {
+
+            switch (_recResult['type']) {
+              case 'meter':
+                meterLevel = _recResult['value'];
+                break;
+              case 'finish':
+                results.add(_recResult['value']['results_recognition'][0]);
+                isStart = false;
+                meterLevel = 0;
+                break;
+              case 'lfinish':
+                results.add(_recResult['value']['results_recognition'][0]);
+                isStart = false;
+                meterLevel = 0;
+                break;
+              case 'end':
+                meterLevel = 0;
+                isStart = false;
+                break;
+              default:
+                print(_recResult);
+                break;
+            }
+
+          });
         }
-      });
 
     });
   }
 
   @override
   Widget build(BuildContext context) {
+
+    int icon;
+
+    if (meterLevel <= 0) {
+      icon = 0;
+    } else if (meterLevel <= 4) {
+      icon = 1;
+    } else if (meterLevel <= 20) {
+      icon = 2;
+    } else if (meterLevel <= 36) {
+      icon = 3;
+    } else if (meterLevel <= 52) {
+      icon = 4;
+    } else if (meterLevel <= 68) {
+      icon = 5;
+    } else {
+      icon = 6;
+    }
+
+    print('$icon');
+
     return new MaterialApp(
       home: new Scaffold(
         appBar: new AppBar(
@@ -133,17 +228,30 @@ class _MyAppState extends State<MyApp> {
 
               children: <Widget>[
 
-                Expanded(child: Container()),
+                Expanded(child: ListView.builder(
 
-                SizedBox(
-                  width: double.infinity,
-                  child: RaisedButton(
-                    onPressed: _startSpeechRecognition,
-                    child: Text(
-                      isStart ? '取消' : '开始',
-                    ),
-                  ),
-                )
+                  itemBuilder: _buildRecognitionResultItem,
+                  itemCount: results.length,
+                  //reverse: true,
+
+                )),
+
+                Container(height: 4.0),
+
+                Material(
+
+                   elevation: 3.0,
+                   borderRadius: BorderRadius.all(Radius.circular(4.0)),
+                   child: IconButton(
+                     onPressed: _startSpeechRecognition,
+
+                     icon: Image(image: AssetImage(icons[icon])),
+                     //color: Colors.blue,
+                     tooltip: 'tap to speaking....',
+
+                   ),
+
+               )
 
               ],
 

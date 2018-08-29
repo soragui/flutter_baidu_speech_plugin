@@ -4,14 +4,20 @@ import 'package:flutter/services.dart';
 
 class BaiduSpeechRecognition {
 
- /// Speech recognition callback stream
+  /// Flutter Baidu Speech Recognition plugin. Now only have a normal and long
+  /// speech recognition. At present only support for iOS.
+  BaiduSpeechRecognition();
+
+  /// Speech recognition callback stream
+  /// The return [String] is a JSON [Map<String, dynamic>]
+  /// Using [jsonDecode] to to see the result .
   Stream<String> _onVoiceRecognitionCallback;
 
-/// Method channel for speech function
+  /// Method channel for speech function
   static const MethodChannel _channel =
       const MethodChannel('baidu_speech_channel');
 
-/// Event channel for speech recognition callback
+  /// Event channel for speech recognition callback
   static const EventChannel _callback =
     const EventChannel('baidu_speech_callback');
  
@@ -32,14 +38,14 @@ class BaiduSpeechRecognition {
 
   // 语音 识别 回调函数
   /// For voice recognition status and result callback
-  Stream<String> onVoiceRecognition() {
-
+  /// return a [Stream<String>] for listen
+  Stream<String> get speechRecognitionEvents  {
     if (_onVoiceRecognitionCallback == null) {
-
+      
       _onVoiceRecognitionCallback = _callback
           .receiveBroadcastStream()
-          .map((result) => result);
-
+          .map((dynamic event) => event);
+      
     }
 
     return _onVoiceRecognitionCallback;
