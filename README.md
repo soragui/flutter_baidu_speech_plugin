@@ -59,7 +59,8 @@ the `type` have the following value:
 
 | type | desc |
 |---|---|
-|start|start speaking...|
+|ready|ready to speaking...|
+|start|detect start speaking...|
 |stop|stop speaking. and return the last result|
 |cancel|cancel the last recognition|
 |finish|return the last recognition|
@@ -83,9 +84,9 @@ Then open your iOS projcet on Xcode and add the baidu speech SDK library and som
 
 Add **BDSClientLib/libBaiduSpeechSDK.a** to you project group as "create groups",
 
-Add BDSClientResource/ASR/BDSClientResources to your project group as "create folder references",
+Add **BDSClientResource/ASR/BDSClientResources** to your project group as "create folder references",
 
-Add BDSClientResource/ASR/BDSClientEASRResources to your project group as "create groups".
+Add **BDSClientResource/ASR/BDSClientEASRResources** to your project group as "create groups".
 
 Add the follow framework to your project:
 
@@ -97,3 +98,8 @@ Add the follow framework to your project:
 | libiconv.2.4.0.tbd | Some utility |
 
 Finally add Microphone Usage privacy to your info.plist file.
+
+#### Project Setting
+Open you project with xcode and go to Pods, select the baidu_speech_recognition TARGETS, then select the Build Settings Tab, Change Mach-O Type to **Static Library**.Then go to the Build Phases, make sure all the Headers are Public.
+
+If you have any problem or Error Please make a [issue](https://github.com/soragui/flutter_baidu_speech_plugin/issues).

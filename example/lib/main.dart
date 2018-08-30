@@ -32,6 +32,7 @@ class _MyAppState extends State<MyApp> {
   int meterLevel = 0;
 
   StreamSubscription<dynamic> _speechEvents;
+  String status = 'Tap To Speaking...';
 
   final List<String> icons = <String>[
 
@@ -157,6 +158,12 @@ class _MyAppState extends State<MyApp> {
               case 'meter':
                 meterLevel = _recResult['value'];
                 break;
+              case 'ready':
+                status = 'ready...';
+                break;
+              case 'start':
+                status = 'speaking...';
+                break;
               case 'finish':
                 results.add(_recResult['value']['results_recognition'][0]);
                 isStart = false;
@@ -251,7 +258,20 @@ class _MyAppState extends State<MyApp> {
 
                    ),
 
-               )
+                ),
+
+                Padding(
+                  
+                  padding: EdgeInsets.all(10.0),
+                  
+                  child: Text(
+
+                      status
+
+                  ),
+                  
+                )
+                ,
 
               ],
 

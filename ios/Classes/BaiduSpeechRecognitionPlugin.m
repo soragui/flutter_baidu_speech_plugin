@@ -1,5 +1,6 @@
 #import "BaiduSpeechRecognitionPlugin.h"
 
+
 //#error "请在官网新建应用，配置包名，并在此填写应用的 api key, secret key, appid(即appcode)"
 const NSString* API_KEY = @"Ge2kYvna0IymBqcupFwq5fAV";
 const NSString* SECRET_KEY = @"skMQOIKKmqLI2brAceEkadz9VgjO3KfR";
@@ -40,6 +41,7 @@ const NSString* APP_ID = @"11719380";
     
     NSLog(@"plugin init");
     self.asrEventManager = [BDSEventManager createEventManagerWithName:BDS_ASR_NAME];
+    [self.asrEventManager setDelegate:self];
     return self;
 }
 
@@ -81,7 +83,7 @@ const NSString* APP_ID = @"11719380";
 // 语音识别 配置
 - (void)configVoiceRecognitionClient {
     //设置DEBUG_LOG的级别
-    [self.asrEventManager setParameter:@(EVRDebugLogLevelTrace) forKey:BDS_ASR_DEBUG_LOG_LEVEL];
+    [self.asrEventManager setParameter:@(EVRDebugLogLevelError) forKey:BDS_ASR_DEBUG_LOG_LEVEL];
     //配置API_KEY 和 SECRET_KEY 和 APP_ID
     [self.asrEventManager setParameter:@[API_KEY, SECRET_KEY] forKey:BDS_ASR_API_SECRET_KEYS];
     [self.asrEventManager setParameter:APP_ID forKey:BDS_ASR_OFFLINE_APP_CODE];
@@ -108,17 +110,6 @@ const NSString* APP_ID = @"11719380";
     [self.asrEventManager setParameter:@"1536" forKey:BDS_ASR_PRODUCT_ID];
 }
 
-// 语音流  识别
-- (void)audioStreamRecognition
-{
-    AudioInputStream *stream = [[AudioInputStream alloc] init];
-    [self.asrEventManager setParameter:stream forKey:BDS_ASR_AUDIO_INPUT_STREAM];
-    [self.asrEventManager setParameter:@"" forKey:BDS_ASR_AUDIO_FILE_PATH];
-    [self.asrEventManager setDelegate:self];
-    [self.asrEventManager sendCommand:BDS_ASR_CMD_START];
-    //[self onInitializing];
-}
-
 // 开启 长语音识别
 - (void)longSpeechRecognition
 {
@@ -135,8 +126,7 @@ const NSString* APP_ID = @"11719380";
 - (void)start
 {
     self.longSpeechFlag = NO;
-    [self configFileHandler];
-    [self.asrEventManager setDelegate:self];
+    //[self configFileHandler];
     [self.asrEventManager setParameter:nil forKey:BDS_ASR_AUDIO_FILE_PATH];
     [self.asrEventManager setParameter:nil forKey:BDS_ASR_AUDIO_INPUT_STREAM];
     [self.asrEventManager sendCommand:BDS_ASR_CMD_START];
@@ -192,12 +182,6 @@ const NSString* APP_ID = @"11719380";
     }
 }
 
-// 调试 输出
-- (void)printLogTextView:(NSString *)logString
-{
-    //NSLog (logString);
-}
-
 - (NSDictionary *)parseLogToDic:(NSString *)logString
 {
     NSArray *tmp = NULL;
@@ -240,22 +224,15 @@ const NSString* APP_ID = @"11719380";
     NSMutableDictionary *returnDic = [[NSMutableDictionary alloc] initWithCapacity:2];
     
     switch (workStatus) {
-        
-        case EVoiceRecognitionClientWorkStatusNewRecordData: {
-            [self.fileHandler writeData:(NSData *)aObj];
-            break;
-        }
             
+            // 可以开始 说话了
         case EVoiceRecognitionClientWorkStatusStartWorkIng: {
-            NSDictionary *logDic = [self parseLogToDic:aObj];
-            [self printLogTextView:[NSString stringWithFormat:@"CALLBACK: start vr, log: %@\n", logDic]];
+            [returnDic setObject:@"ready" forKey:@"type"];
             break;
         }
             
         case EVoiceRecognitionClientWorkStatusMeterLevel: {
             
-            //[self printLogTextView:[NSString stringWithFormat:@"CALLBACK: meter level %@", aObj]];
-            //NSMutableDictionary *meterDic = [[NSMutableDictionary alloc] initWithCapacity:2];
             [returnDic setObject:@"meter" forKey:@"type"];
             [returnDic setObject:aObj forKey:@"value"];
             
@@ -266,7 +243,7 @@ const NSString* APP_ID = @"11719380";
             
             
         case EVoiceRecognitionClientWorkStatusStart: {
-            [self printLogTextView:@"CALLBACK: detect voice start point.\n"];
+            //[self printLogTextView:@"CALLBACK: detect voice start point.\n"];
             [returnDic setObject:@"start" forKey:@"type"];
             
             self.flutterEventSink([self getDescriptionForDic:returnDic]);
@@ -274,7 +251,7 @@ const NSString* APP_ID = @"11719380";
         }
             
         case EVoiceRecognitionClientWorkStatusEnd: {
-            [self printLogTextView:@"CALLBACK: detect voice end point.\n"];
+            //[self printLogTextView:@"CALLBACK: detect voice end point.\n"];
             [returnDic setObject:@"end" forKey:@"type"];
             
             self.flutterEventSink([self getDescriptionForDic:returnDic]);
@@ -282,7 +259,7 @@ const NSString* APP_ID = @"11719380";
         }
             
         case EVoiceRecognitionClientWorkStatusCancel: {
-            [self printLogTextView:@"CALLBACK: user press cancel.\n"];
+            //[self printLogTextView:@"CALLBACK: user press cancel.\n"];
             [returnDic setObject:@"cancel" forKey:@"type"];
             
             self.flutterEventSink([self getDescriptionForDic:returnDic]);
@@ -301,9 +278,6 @@ const NSString* APP_ID = @"11719380";
         }
             
         case EVoiceRecognitionClientWorkStatusFinish: {
-            //[self printLogTextView:[NSString stringWithFormat:@"CALLBACK: final result - %@.\n\n", [self getDescriptionForDic:aObj]]];
-            
-            //[returnDic setObject:@"finish" forKey:@"type"];
             
             if (!self.longSpeechFlag) {
                 [returnDic setObject:@"finish" forKey:@"type"];
@@ -319,6 +293,9 @@ const NSString* APP_ID = @"11719380";
         }
             
         case EVoiceRecognitionClientWorkStatusError: {
+            
+            [returnDic setObject:@"error" forKey:@"type"];
+            [returnDic setObject:aObj forKey:@"value"];
             break;
         }
     }
