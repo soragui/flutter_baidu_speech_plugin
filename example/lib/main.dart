@@ -156,7 +156,10 @@ class _MyAppState extends State<MyApp> {
 
             switch (_recResult['type']) {
               case 'meter':
-                meterLevel = _recResult['value'];
+                print('${_recResult['value']['volume-percent']}');
+                Theme.of(context).platform == TargetPlatform.android ?
+                    meterLevel = _recResult['value']['volume'] :
+                    meterLevel = _recResult['value'];
                 break;
               case 'ready':
                 status = 'ready...';
@@ -165,7 +168,8 @@ class _MyAppState extends State<MyApp> {
                 status = 'speaking...';
                 break;
               case 'finish':
-                results.add(_recResult['value']['results_recognition'][0]);
+                print(_recResult['value']['results_recognition'][0]);
+                results.add(_recResult['value']['results_recognition']);
                 isStart = false;
                 meterLevel = 0;
                 break;
@@ -176,6 +180,7 @@ class _MyAppState extends State<MyApp> {
                 break;
               case 'end':
                 meterLevel = 0;
+                status = 'Tap To Speaking...';
                 isStart = false;
                 break;
               default:
@@ -193,6 +198,8 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
 
     int icon;
+
+    print('Meter Level :$meterLevel');
 
     if (meterLevel <= 0) {
       icon = 0;

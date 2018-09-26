@@ -1,6 +1,5 @@
 package com.kinezhou.baiduspeechrecognition;
 
-import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
@@ -18,13 +17,15 @@ import com.baidu.speech.EventManager;
 import com.baidu.speech.EventManagerFactory;
 import com.baidu.speech.asr.SpeechConstant;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /** BaiduSpeechRecognitionPlugin */
-public class BaiduSpeechRecognitionPlugin implements MethodCallHandler , EventChannel.StreamHandler, EventListener{
+public class BaiduSpeechRecognitionPlugin implements MethodCallHandler ,
+        EventChannel.StreamHandler, EventListener{
   /** Plugin registration. */
 
   private static final String TAG = "CALLBACK";
@@ -39,6 +40,7 @@ public class BaiduSpeechRecognitionPlugin implements MethodCallHandler , EventCh
   private static final String SPEECH_CANCEL_METHOD = "speechCancel";
 
   private Map<String, Object> params = new LinkedHashMap<>();
+  private Map<String, Object> result = new LinkedHashMap<>();
 
   private EventManager asr;
   private EventSink eventSink;
@@ -47,17 +49,20 @@ public class BaiduSpeechRecognitionPlugin implements MethodCallHandler , EventCh
   private BaiduSpeechRecognitionPlugin(Context context) {
 
     asr = EventManagerFactory.create(context, "asr");
-    //asr.registerListener(this);
+    asr.registerListener(this);
 
   }
 
   public static void registerWith(Registrar registrar) {
 
-    final MethodChannel channel = new MethodChannel(registrar.messenger(), METHOD_CHANNEL_NAME);
-    channel.setMethodCallHandler(new BaiduSpeechRecognitionPlugin(registrar.context()));
+      // Using the same plugin instance ...
+      BaiduSpeechRecognitionPlugin plugin = new BaiduSpeechRecognitionPlugin(registrar.context());
 
-    final EventChannel callback = new EventChannel(registrar.messenger(), STREAM_CHANNEL_NAME);
-    callback.setStreamHandler(new BaiduSpeechRecognitionPlugin(registrar.context()));
+      final MethodChannel channel = new MethodChannel(registrar.messenger(), METHOD_CHANNEL_NAME);
+      channel.setMethodCallHandler(plugin);
+
+      final EventChannel callback = new EventChannel(registrar.messenger(), STREAM_CHANNEL_NAME);
+      callback.setStreamHandler(plugin);
 
   }
 
@@ -159,11 +164,11 @@ public class BaiduSpeechRecognitionPlugin implements MethodCallHandler , EventCh
    * @param eventSink
    */
   @Override
-  public void onListen(Object o, EventSink eventSink) {
+  public void onListen(Object o, final EventSink eventSink) {
       Log.i(TAG, "onListen");
-      eventListener = createSpeechEventListener(eventSink);
+      //eventListener = createSpeechEventListener(eventSink);
       this.eventSink = eventSink;
-      asr.registerListener(eventListener);
+
   }
 
   @Override
@@ -171,90 +176,78 @@ public class BaiduSpeechRecognitionPlugin implements MethodCallHandler , EventCh
     asr.unregisterListener(eventListener);
   }
 
-  private EventListener createSpeechEventListener(final EventSink events) {
+  @Override
+  public void onEvent(String name, String params, byte[] data, int offset, int length) {
 
-      if (events != null) Log.i(TAG, "create Listener");
+      result.clear();
 
-      return new EventListener() {
+      switch (name) {
 
-          @Override
-          public void onEvent(String name, String params, byte[] data, int offset, int length) {
+          case SpeechConstant.CALLBACK_EVENT_ASR_READY:
+              Log.i(TAG, "Ready");
+              result.put("type", "ready");
+              eventSink.success(new JSONObject(result).toString());
+              break;
 
-              Log.i(TAG, "onEvent");
+          case SpeechConstant.CALLBACK_EVENT_ASR_BEGIN:
+              Log.i("CALLBACK", "Begin");
+              result.put("type", "start");
+              eventSink.success(new JSONObject(result).toString());
+              break;
 
-              switch (name) {
+          case SpeechConstant.CALLBACK_EVENT_ASR_CANCEL:
+              Log.i(TAG, "Cancel");
+              result.put("type", "cancel");
+              eventSink.success(new JSONObject(result).toString());
+              break;
 
-                  case SpeechConstant.CALLBACK_EVENT_ASR_READY:
-                      Log.i(TAG, "Ready");
-                      break;
+          case SpeechConstant.CALLBACK_EVENT_ASR_EXIT:
+              Log.i(TAG, "stop");
+              eventSink.success(new JSONObject(result).toString());
+              break;
 
-                  case SpeechConstant.CALLBACK_EVENT_ASR_BEGIN:
-                      Log.i("CALLBACK", "Begin");
-                      break;
-
-                  case SpeechConstant.CALLBACK_EVENT_ASR_END:
-                      Log.i(TAG, "End");
-                      break;
-                  case SpeechConstant.CALLBACK_EVENT_ASR_PARTIAL:
-                      Log.i("CALLBACK", params);
-
-                      break;
-                  case SpeechConstant.CALLBACK_EVENT_ASR_FINISH:
-                      Log.i(TAG, "Finish");
-                      events.success(params);
-                      break;
-                  case SpeechConstant.CALLBACK_EVENT_ASR_VOLUME:
-                      Log.i(TAG, "onVolume");
-                      events.success(params);
-                      break;
-                  default:
-                      events.success("DEFAULT:");
-                      break;
-
-
+          case SpeechConstant.CALLBACK_EVENT_ASR_END:
+              Log.i(TAG, "End");
+              result.put("type", "end");
+              eventSink.success(new JSONObject(result).toString());
+              break;
+          case SpeechConstant.CALLBACK_EVENT_ASR_PARTIAL:
+              Log.i("CALLBACK", params);
+              result.put("type", "finish");
+              try {
+                  JSONObject json = new JSONObject(params);
+                  result.put("value", json);
+              } catch (JSONException e) {
+                  e.printStackTrace();
               }
-          }
+              eventSink.success(new JSONObject(result).toString());
+              break;
+          case SpeechConstant.CALLBACK_EVENT_ASR_FINISH:
+              Log.i(TAG, "Finish");
 
-      };
+              break;
 
+          case SpeechConstant.CALLBACK_EVENT_ASR_LONG_SPEECH:
+              Log.i(TAG, "LFinish");
+              result.put("type", "lfinish");
+
+              eventSink.success(new JSONObject(result).toString());
+
+          case SpeechConstant.CALLBACK_EVENT_ASR_VOLUME:
+              Log.i(TAG, "onVolume");
+              result.put("type", "meter");
+              try {
+                  JSONObject json = new JSONObject(params);
+                  result.put("value", json);
+              } catch (JSONException e) {
+                  e.printStackTrace();
+              }
+              eventSink.success(new JSONObject(result).toString());
+              break;
+          default:
+              eventSink.success("DEFAULT:");
+              break;
+      }
   }
-
-    @Override
-    public void onEvent(String name, String params, byte[] data, int offset, int length) {
-
-        Log.i(TAG, "onEvent");
-
-        switch (name) {
-
-            case SpeechConstant.CALLBACK_EVENT_ASR_READY:
-                Log.i(TAG, "Ready");
-                break;
-
-            case SpeechConstant.CALLBACK_EVENT_ASR_BEGIN:
-                Log.i("CALLBACK", "Begin");
-                break;
-
-            case SpeechConstant.CALLBACK_EVENT_ASR_END:
-                Log.i(TAG, "End");
-                break;
-            case SpeechConstant.CALLBACK_EVENT_ASR_PARTIAL:
-                Log.i("CALLBACK", params);
-
-                break;
-            case SpeechConstant.CALLBACK_EVENT_ASR_FINISH:
-                Log.i(TAG, "Finish");
-                eventSink.success(params);
-                break;
-            case SpeechConstant.CALLBACK_EVENT_ASR_VOLUME:
-                Log.i(TAG, "onVolume");
-                eventSink.success(params);
-                break;
-            default:
-                eventSink.success("DEFAULT:");
-                break;
-
-
-        }
-    }
 
 }

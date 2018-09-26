@@ -103,3 +103,11 @@ Finally add Microphone Usage privacy to your info.plist file.
 Open you project with xcode and go to Pods, select the baidu_speech_recognition TARGETS, then select the Build Settings Tab, Change Mach-O Type to **Static Library**.Then go to the Build Phases, make sure all the Headers are Public.
 
 If you have any problem or Error Please make a [issue](https://github.com/soragui/flutter_baidu_speech_plugin/issues).
+
+
+### For Android developer
+
+First [become](https://ai.baidu.com/docs#/Begin/top) a baidu Developer
+
+The Follow the [guide](https://ai.baidu.com/docs#/ASR-Android-SDK/55389ffa) to add some permission and file you need
+
