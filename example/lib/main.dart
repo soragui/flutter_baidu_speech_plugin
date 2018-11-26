@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import 'package:baidu_speech_recognition/baidu_speech_recognition.dart';
 import 'dart:convert';
-import 'dart:async';
 
 void main() => runApp(new MyApp());
 
@@ -23,6 +22,7 @@ class _MyAppState extends State<MyApp> {
   Map<String, dynamic> _recResult;
 
   BaiduSpeechRecognition _speechRecognition = BaiduSpeechRecognition();
+  ScrollController _controller = ScrollController();
 
   bool isStart = false;
   bool isLongSpeech = false;
@@ -31,7 +31,7 @@ class _MyAppState extends State<MyApp> {
 
   int meterLevel = 0;
 
-  StreamSubscription<dynamic> _speechEvents;
+  //StreamSubscription<dynamic> _speechEvents;
   String status = 'Tap To Speaking...';
 
   final List<String> icons = <String>[
@@ -144,7 +144,7 @@ class _MyAppState extends State<MyApp> {
     // 初始化
     _speechRecognition.init().then((value) => print(value));
 
-    _speechEvents = _speechRecognition.speechRecognitionEvents
+    _speechRecognition.speechRecognitionEvents
       .listen((String value) {
 
         if (value != null) {
@@ -169,13 +169,16 @@ class _MyAppState extends State<MyApp> {
                 break;
               case 'finish':
                 print(_recResult['value']['results_recognition'][0]);
-                results.add(_recResult['value']['results_recognition']);
-                isStart = false;
+                results.add(_recResult['value']['results_recognition'][0]);
+                _controller.jumpTo(
+                  _controller.position.maxScrollExtent
+                );
+                //isStart = false;
                 meterLevel = 0;
                 break;
               case 'lfinish':
                 results.add(_recResult['value']['results_recognition'][0]);
-                isStart = false;
+                //isStart = false;
                 meterLevel = 0;
                 break;
               case 'end':
@@ -243,7 +246,7 @@ class _MyAppState extends State<MyApp> {
               children: <Widget>[
 
                 Expanded(child: ListView.builder(
-
+                  controller: _controller,
                   itemBuilder: _buildRecognitionResultItem,
                   itemCount: results.length,
                   //reverse: true,

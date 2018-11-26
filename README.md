@@ -4,12 +4,6 @@
 
 A speech recognition plugin for flutter using BaiduSDK.See the changelog for more information about the function.
 
-
-## TODO
-
-- [x] iOS support
-- [ ] Android support
-
 ## Getting Started
 
 Add this to your package's pubspec.yaml file:
