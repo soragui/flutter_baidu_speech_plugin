@@ -9,7 +9,7 @@ A speech recognition plugin for flutter using BaiduSDK.See the changelog for mor
 Add this to your package's pubspec.yaml file:
 ```yaml
 dependencies:
-    baidu_speech_recognition: x.x.x
+    baidu_speech_recognition: 0.1.3
 ```
 
 ### Basic Usage
