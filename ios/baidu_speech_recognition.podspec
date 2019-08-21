@@ -3,7 +3,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'baidu_speech_recognition'
-  s.version          = '0.0.1'
+  s.version          = '0.1.4'
   s.summary          = 'Baidu Speech Recognition Flutter plugin.'
   s.description      = <<-DESC
 Baidu Speech Recognition Flutter plugin.

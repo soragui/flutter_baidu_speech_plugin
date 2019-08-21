@@ -2,7 +2,15 @@
 
 [![pub](https://img.shields.io/pub/v/baidu_speech_recognition.svg?style=flat-square)](https://pub.dartlang.org/packages/baidu_speech_recognition)
 
-A speech recognition plugin for flutter using BaiduSDK.See the changelog for more information about the function.
+>A speech recognition plugin for flutter using BaiduSDK.See the changelog for more information about the function.
+
+- [Flutter Baidu Speech Recognition Plugin](#flutter-baidu-speech-recognition-plugin)
+  - [Getting Started](#getting-started)
+    - [Basic Usage](#basic-usage)
+    - [The Callback Listener](#the-callback-listener)
+  - [For iOS developer](#for-ios-developer)
+      - [Project Setting](#project-setting)
+  - [For Android developer](#for-android-developer)
 
 ## Getting Started
 
@@ -15,7 +23,7 @@ dependencies:
 ### Basic Usage
 
 ```dart
-import 'package:baidu_speech_recognition_example/speech_app.dart';
+import 'package:baidu_speech_recognition/baidu_speech_recognition.dart';
 
 BaiduSpeechRecognition _speechRecognition = BaiduSpeechRecognition();
 
@@ -62,7 +70,7 @@ the `type` have the following value:
 |end|end speaking...|
 |meter|return volume meter level|
 
-### For iOS developer
+## For iOS developer
 Go to [百度ASR](http://ai.baidu.com/sdk#asr) download SDK for iOS,then copy BDSClientLib and BDSClientResource to the same directory of you flutter project,the file structure like this:
 ```bash
 ----------------
@@ -82,7 +90,7 @@ Add **BDSClientResource/ASR/BDSClientResources** to your project group as "creat
 
 Add **BDSClientResource/ASR/BDSClientEASRResources** to your project group as "create groups".
 
-Add the follow framework to your project:
+Add the following framework to your project:
 
 | Framework | Desc |
 | --------- | ---- |
@@ -99,9 +107,8 @@ Open you project with xcode and go to Pods, select the baidu_speech_recognition 
 If you have any problem or Error Please make a [issue](https://github.com/soragui/flutter_baidu_speech_plugin/issues).
 
 
-### For Android developer
+## For Android developer
 
 First [become](https://ai.baidu.com/docs#/Begin/top) a baidu Developer
 
 The Follow the [guide](https://ai.baidu.com/docs#/ASR-Android-SDK/55389ffa) to add some permission and file you need
-
