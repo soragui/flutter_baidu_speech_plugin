@@ -1,8 +1,9 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:baidu_speech_recognition/baidu_speech_recognition.dart';
 import 'dart:convert';
+
+import 'package:baidu_speech_recognition/baidu_speech_recognition.dart';
 
 void main() => runApp(new MyApp());
 
@@ -15,6 +16,9 @@ class MyApp extends StatefulWidget {
 }
 
 enum MenuItem { longSpeech }
+
+const String START = 'Speaking ...';
+const String STOP  = 'Tap To Speaking ...';
 
 class _MyAppState extends State<MyApp> {
 
@@ -30,9 +34,10 @@ class _MyAppState extends State<MyApp> {
   List<String> results = List();
 
   int meterLevel = 0;
+  int iconNum = 0;
 
   //StreamSubscription<dynamic> _speechEvents;
-  String status = 'Tap To Speaking...';
+  String status = STOP;
 
   final List<String> icons = <String>[
 
@@ -115,11 +120,13 @@ class _MyAppState extends State<MyApp> {
         _speechRecognition.start().then((value) => print(value));
       }
       isStart = true;
+      status = START;
 
     } else {
 
       _speechRecognition.stop().then((value) => print(value));
       isStart = false;
+      status = STOP;
 
     }
 
@@ -134,6 +141,28 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       isLongSpeech = value;
     });
+
+  }
+
+  _changeVoiceIconNumber() {
+
+    print('Meter Level :$meterLevel');
+
+    if (meterLevel <= 0) {
+      iconNum = 0;
+    } else if (meterLevel <= 4) {
+      iconNum = 1;
+    } else if (meterLevel <= 20) {
+      iconNum = 2;
+    } else if (meterLevel <= 36) {
+      iconNum = 3;
+    } else if (meterLevel <= 52) {
+      iconNum = 4;
+    } else if (meterLevel <= 68) {
+      iconNum = 5;
+    } else {
+      iconNum = 6;
+    }
 
   }
 
@@ -156,7 +185,7 @@ class _MyAppState extends State<MyApp> {
 
             switch (_recResult['type']) {
               case 'meter':
-                print('${_recResult['value']['volume-percent']}');
+                //print('${_recResult['value']['volume-percent']}');
                 Theme.of(context).platform == TargetPlatform.android ?
                     meterLevel = _recResult['value']['volume'] :
                     meterLevel = _recResult['value'];
@@ -165,7 +194,7 @@ class _MyAppState extends State<MyApp> {
                 status = 'ready...';
                 break;
               case 'start':
-                status = 'speaking...';
+                status = START;
                 break;
               case 'finish':
                 print(_recResult['value']['results_recognition'][0]);
@@ -173,7 +202,8 @@ class _MyAppState extends State<MyApp> {
                 _controller.jumpTo(
                   _controller.position.maxScrollExtent
                 );
-                //isStart = false;
+                isStart = false;
+                status = STOP;
                 meterLevel = 0;
                 break;
               case 'lfinish':
@@ -183,13 +213,15 @@ class _MyAppState extends State<MyApp> {
                 break;
               case 'end':
                 meterLevel = 0;
-                status = 'Tap To Speaking...';
+                status = STOP;
                 isStart = false;
                 break;
               default:
                 print(_recResult);
                 break;
             }
+
+            _changeVoiceIconNumber();
 
           });
         }
@@ -199,28 +231,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-
-    int icon;
-
-    print('Meter Level :$meterLevel');
-
-    if (meterLevel <= 0) {
-      icon = 0;
-    } else if (meterLevel <= 4) {
-      icon = 1;
-    } else if (meterLevel <= 20) {
-      icon = 2;
-    } else if (meterLevel <= 36) {
-      icon = 3;
-    } else if (meterLevel <= 52) {
-      icon = 4;
-    } else if (meterLevel <= 68) {
-      icon = 5;
-    } else {
-      icon = 6;
-    }
-
-    print('$icon');
 
     return new MaterialApp(
       home: new Scaffold(
@@ -262,7 +272,7 @@ class _MyAppState extends State<MyApp> {
                    child: IconButton(
                      onPressed: _startSpeechRecognition,
 
-                     icon: Image(image: AssetImage(icons[icon])),
+                     icon: Image(image: AssetImage(icons[iconNum])),
                      //color: Colors.blue,
                      tooltip: 'tap to speaking....',
 
