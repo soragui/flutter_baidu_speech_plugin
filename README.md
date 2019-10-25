@@ -17,7 +17,7 @@
 Add this to your package's pubspec.yaml file:
 ```yaml
 dependencies:
-    baidu_speech_recognition: 0.1.3
+    baidu_speech_recognition: 0.1.4
 ```
 
 ### Basic Usage
