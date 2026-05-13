@@ -71,7 +71,7 @@ the `type` have the following value:
 |meter|return volume meter level|
 
 ## For iOS developer
-Go to [百度ASR](http://ai.baidu.com/sdk#asr) download SDK for iOS,then copy BDSClientLib and BDSClientResource to the same directory of you flutter project,the file structure like this:
+Go to [百度ASR](https://ai.baidu.com/sdk#speech) download SDK for iOS,then copy BDSClientLib and BDSClientResource to the same directory of you flutter project,the file structure like this:
 ```bash
 ----------------
   |
