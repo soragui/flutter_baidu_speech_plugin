@@ -1,3 +1,6 @@
+## 0.1.5
+- update to dart 3 null safety
+
 ## 0.1.4
 - fix example bug
 - update readme

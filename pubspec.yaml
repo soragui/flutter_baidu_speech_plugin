@@ -14,10 +14,10 @@ dependencies:
 # following page: https://www.dartlang.org/tools/pub/pubspec
 
 # The following section is specific to Flutter.
-flutter:
-  plugin:
-    androidPackage: com.kinezhou.baiduspeechrecognition
-    pluginClass: BaiduSpeechRecognitionPlugin
+#flutter:
+#  plugin:
+#    androidPackage: com.kinezhou.baiduspeechrecognition
+#    pluginClass: BaiduSpeechRecognitionPlugin
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
