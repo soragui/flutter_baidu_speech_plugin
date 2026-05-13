@@ -5,7 +5,7 @@ author: soragui <ziwo520@msn.cn>
 homepage: https://github.com/soragui/flutter_baidu_speech_plugin
 
 environment:
-  sdk: ">=2.0.0-dev.68.0 <3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:

@@ -11,7 +11,9 @@ class BaiduSpeechRecognition {
   /// Speech recognition callback stream
   /// The return [String] is a JSON [Map<String, dynamic>]
   /// Using [jsonDecode] to to see the result .
-  Stream<String> _onVoiceRecognitionCallback;
+  late final Stream<String> _onVoiceRecognitionCallback = _callback
+      .receiveBroadcastStream()
+      .map((dynamic event) => event);
 
   /// Method channel for speech function
   static const MethodChannel _channel =
@@ -39,16 +41,5 @@ class BaiduSpeechRecognition {
   // 语音 识别 回调函数
   /// For voice recognition status and result callback
   /// return a [Stream<String>] for listen
-  Stream<String> get speechRecognitionEvents  {
-    if (_onVoiceRecognitionCallback == null) {
-      
-      _onVoiceRecognitionCallback = _callback
-          .receiveBroadcastStream()
-          .map((dynamic event) => event);
-      
-    }
-
-    return _onVoiceRecognitionCallback;
-
-  }
+  Stream<String> get speechRecognitionEvents => _onVoiceRecognitionCallback;
 }

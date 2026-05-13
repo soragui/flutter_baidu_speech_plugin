@@ -23,7 +23,7 @@ const String STOP  = 'Tap To Speaking ...';
 class _MyAppState extends State<MyApp> {
 
 
-  Map<String, dynamic> _recResult;
+  late Map<String, dynamic> _recResult;
 
   BaiduSpeechRecognition _speechRecognition = BaiduSpeechRecognition();
   ScrollController _controller = ScrollController();
@@ -31,7 +31,7 @@ class _MyAppState extends State<MyApp> {
   bool isStart = false;
   bool isLongSpeech = false;
   
-  List<String> results = List();
+  List<String> results = [];
 
   int meterLevel = 0;
   int iconNum = 0;
@@ -136,10 +136,10 @@ class _MyAppState extends State<MyApp> {
 
   }
 
-  _onLongSpeechChange(bool value) {
+  _onLongSpeechChange(bool? value) {
 
     setState(() {
-      isLongSpeech = value;
+      isLongSpeech = value ?? false;
     });
 
   }
@@ -175,8 +175,6 @@ class _MyAppState extends State<MyApp> {
 
     _speechRecognition.speechRecognitionEvents
       .listen((String value) {
-
-        if (value != null) {
 
         _recResult = jsonDecode(value);
         print(_recResult);
@@ -224,7 +222,6 @@ class _MyAppState extends State<MyApp> {
             _changeVoiceIconNumber();
 
           });
-        }
 
     });
   }
